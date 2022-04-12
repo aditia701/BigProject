@@ -1,0 +1,7 @@
+---
+- name: Install NGINX+Jenkins
+  hosts: client
+  become: yes
+  roles:
+  - jenkins
+  - nginx

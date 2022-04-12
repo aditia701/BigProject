@@ -1,0 +1,48 @@
+- name: Remove default file dari sites-enabled
+  file:
+    path : /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Add repo certbot
+  shell: add-apt-repository -r ppa:certbot/certbot -y
+
+- name: update pkg
+  shell: apt update
+
+- name: install python3-certbot-nginx
+  shell: apt install certbot python3-certbot-nginx -y
+
+- name: Generate Certificate 
+  shell: certbot certonly --nginx -d jenkins.aditia701.xyz -m aditiai28@gmail.com --non-interactive --agree-tos
+
+- name: create dir /etc/nginx/ssl/
+  file:
+    path: /etc/nginx/ssl/
+    state: directory
+
+- name: generate dhparam 2048
+  openssl_dhparam:
+    path: /etc/nginx/ssl/dhparam.pem
+    size: 2048
+
+- name: stop nginx
+  service: 
+    name: nginx
+    state: stopped
+
+- name: Copy nginx configuration 
+  template: src=jenkins.aditia701.xyz dest=/etc/nginx/sites-enabled/jenkins.aditia701.xyz
+
+- name: cek nginx config 
+  shell: nginx -t
+
+- name: restart nginx
+  service: 
+    name: nginx
+    state: restarted
+
+
+
+
+
+

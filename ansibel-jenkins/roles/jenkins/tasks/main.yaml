@@ -1,0 +1,20 @@
+---
+- name: Update pkg ubuntu
+  shell : apt update
+
+- name: add jenkins key gpg
+  shell : wget -qO - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add -
+  args:  
+    warn : false
+
+- name: add jenkins binary
+  shell : sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+
+- name: Update pkg ubuntu
+  shell : apt update
+
+- name: install java 
+  shell : apt install openjdk-11-jre -y
+
+- name: install jenkins
+  shell : apt install jenkins -y
