@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging
+  labels:
+    name: staging
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: staging
+spec:
+  ports:
+    - port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: frontend
+  type: ClusterIP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend-ingress
+  namespace: staging
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: frontend-sta.aditia701.xyz
+    http:
+      paths: 
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: frontend-service
+            port: 
+              number: 3000
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: staging
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: aditiaipr/frontend:latest
+          env:
+            - name: REACT_APP_BASE_URL
+              value: "https://backend-sta.aditia701.xyz"
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              cpu: 700m
+              memory: 800Mi
+            requests:
+              cpu: 200m
+              memory: 400Mi
